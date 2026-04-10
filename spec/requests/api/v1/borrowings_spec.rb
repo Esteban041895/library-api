@@ -42,4 +42,31 @@ RSpec.describe "Api::V1::Borrowings", type: :request do
       end
     end
   end
+
+  describe "PATCH /api/v1/borrowings/:id/return" do
+    let!(:borrowing) { create(:borrowing, user: member, book: book) }
+
+    context "as librarian" do
+      it "marks the book as returned" do
+        patch "/api/v1/borrowings/#{borrowing.id}/return", headers: auth_headers(librarian)
+        expect(response).to have_http_status(:ok)
+        body = JSON.parse(response.body)
+        expect(body["returned_at"]).to eq(Date.today.to_s)
+        expect(body["status"]).to eq("returned")
+      end
+
+      it "returns 422 if already returned" do
+        borrowing.update!(returned_at: Date.today)
+        patch "/api/v1/borrowings/#{borrowing.id}/return", headers: auth_headers(librarian)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    context "as member" do
+      it "returns 403" do
+        patch "/api/v1/borrowings/#{borrowing.id}/return", headers: auth_headers(member)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end

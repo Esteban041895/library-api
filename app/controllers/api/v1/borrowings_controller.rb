@@ -23,6 +23,19 @@ module Api
         end
       end
 
+      def return
+        borrowing = Borrowing.find(params[:id])
+        authorize borrowing, :return?
+
+        if borrowing.returned?
+          render json: { error: "Book already returned" }, status: :unprocessable_entity
+          return
+        end
+
+        borrowing.update!(returned_at: Date.today)
+        render json: borrowing_json(borrowing)
+      end
+
       private
 
       def borrowing_json(borrowing)
