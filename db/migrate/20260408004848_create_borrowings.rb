@@ -9,7 +9,7 @@ class CreateBorrowings < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    add_index :borrowings, [:user_id, :book_id],
+    add_index :borrowings, [ :user_id, :book_id ],
               unique: true,
               where: "returned_at IS NULL",
               name: "index_borrowings_on_user_book_active"

@@ -3,7 +3,7 @@ module Api
     class AuthenticationController < ApplicationController
       include Authenticatable
 
-      skip_before_action :authenticate_request, only: [:register, :login]
+      skip_before_action :authenticate_request, only: [ :register, :login ]
 
       def register
         user = User.new(register_params)
