@@ -1,14 +1,17 @@
 module JwtService
-  SECRET_KEY = Rails.application.credentials.secret_key_base
   ALGORITHM = "HS256"
+
+  def self.secret_key
+    Rails.application.secret_key_base
+  end
 
   def self.encode(payload, exp = 24.hours.from_now)
     payload[:exp] = exp.to_i
-    JWT.encode(payload, SECRET_KEY, ALGORITHM)
+    JWT.encode(payload, secret_key, ALGORITHM)
   end
 
   def self.decode(token)
-    decoded = JWT.decode(token, SECRET_KEY, true, algorithm: ALGORITHM)
+    decoded = JWT.decode(token, secret_key, true, algorithm: ALGORITHM)
     HashWithIndifferentAccess.new(decoded.first)
   rescue JWT::ExpiredSignature
     raise JWT::ExpiredSignature, "Token has expired"

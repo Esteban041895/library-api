@@ -37,7 +37,7 @@ module Api
       end
 
       def register_params
-        params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
+        params.require(:user).permit(:name, :email, :password, :password_confirmation)
       end
 
       def login_params
