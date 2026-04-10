@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
+import { useDebounce } from '../hooks/useDebounce'
 import { BookCard } from '../components/books/BookCard'
 import { SearchBar } from '../components/books/SearchBar'
 import { Button } from '../components/ui/Button'
@@ -14,12 +15,13 @@ export function BooksPage() {
   const { isLibrarian } = useAuth()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 300)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const { data: books = [], isLoading } = useQuery({
-    queryKey: ['books', search],
+    queryKey: ['books', debouncedSearch],
     queryFn: async () => {
-      const { data } = await api.get<Book[]>('/books', { params: search ? { search } : {} })
+      const { data } = await api.get<Book[]>('/books', { params: debouncedSearch ? { search: debouncedSearch } : {} })
       return data
     },
   })
@@ -66,7 +68,7 @@ export function BooksPage() {
         )}
       </div>
 
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar value={search} onChange={handleSearch} />
 
       {feedback && (
         <Alert
