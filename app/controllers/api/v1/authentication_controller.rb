@@ -11,10 +11,24 @@ module Api
         end
       end
 
+      def login
+        user = User.find_by(email: login_params[:email]&.downcase)
+        if user&.authenticate(login_params[:password])
+          token = JwtService.encode(user_id: user.id)
+          render json: { token: token, user: user_payload(user) }
+        else
+          render json: { error: "Invalid email or password" }, status: :unauthorized
+        end
+      end
+
       private
 
       def register_params
         params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
+      end
+
+      def login_params
+        params.require(:user).permit(:email, :password)
       end
 
       def user_payload(user)
