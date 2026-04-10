@@ -43,9 +43,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_09_000001) do
     t.string "password_digest", null: false
     t.string "name", null: false
     t.integer "role", default: 0, null: false
-    t.integer "token_version", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "token_version", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
