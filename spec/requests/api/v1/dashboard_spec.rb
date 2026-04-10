@@ -38,5 +38,30 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
         expect(body["overdue_members"]).to eq([])
       end
     end
+
+    context "as member" do
+      let!(:active_borrowing) { create(:borrowing, user: member, book: book) }
+      let!(:overdue_borrowing) { create(:borrowing, :overdue, user: member, book: create(:book, total_copies: 5)) }
+
+      it "returns member dashboard" do
+        get "/api/v1/dashboard", headers: auth_headers(member)
+        expect(response).to have_http_status(:ok)
+        body = JSON.parse(response.body)
+
+        expect(body["borrowed_books"]).to be_an(Array)
+        expect(body["overdue_books"]).to be_an(Array)
+        expect(body["overdue_books"].length).to eq(1)
+      end
+
+      it "does not include other members' books" do
+        other_member = create(:user, :member)
+        create(:borrowing, user: other_member, book: create(:book, total_copies: 5))
+
+        get "/api/v1/dashboard", headers: auth_headers(member)
+        body = JSON.parse(response.body)
+        total = body["borrowed_books"].length + body["overdue_books"].length
+        expect(total).to eq(2)
+      end
+    end
   end
 end
