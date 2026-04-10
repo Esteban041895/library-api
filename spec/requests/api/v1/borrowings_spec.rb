@@ -1,0 +1,45 @@
+require 'rails_helper'
+
+RSpec.describe "Api::V1::Borrowings", type: :request do
+  let(:librarian) { create(:user, :librarian) }
+  let(:member) { create(:user, :member) }
+  let(:other_member) { create(:user, :member) }
+  let(:book) { create(:book, total_copies: 2) }
+
+  describe "POST /api/v1/borrowings" do
+    context "as member" do
+      it "borrows an available book" do
+        post "/api/v1/borrowings", params: { borrowing: { book_id: book.id } }, headers: auth_headers(member)
+        expect(response).to have_http_status(:created)
+        body = JSON.parse(response.body)
+        expect(body["book"]["id"]).to eq(book.id)
+        expect(body["status"]).to eq("active")
+        expect(body["due_date"]).to eq(2.weeks.from_now.to_date.to_s)
+      end
+
+      it "cannot borrow the same book twice" do
+        create(:borrowing, user: member, book: book)
+        post "/api/v1/borrowings", params: { borrowing: { book_id: book.id } }, headers: auth_headers(member)
+        expect(response).to have_http_status(:unprocessable_entity)
+        body = JSON.parse(response.body)
+        expect(body["errors"]).to include(a_string_matching(/already borrowed/))
+      end
+
+      it "cannot borrow when no copies available" do
+        create(:borrowing, book: book)
+        create(:borrowing, book: book)
+        post "/api/v1/borrowings", params: { borrowing: { book_id: book.id } }, headers: auth_headers(member)
+        expect(response).to have_http_status(:unprocessable_entity)
+        body = JSON.parse(response.body)
+        expect(body["errors"]).to include(a_string_matching(/no available copies/))
+      end
+    end
+
+    context "as librarian" do
+      it "returns 403" do
+        post "/api/v1/borrowings", params: { borrowing: { book_id: book.id } }, headers: auth_headers(librarian)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+end

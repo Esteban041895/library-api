@@ -7,6 +7,8 @@ Rails.application.routes.draw do
       post "login", to: "authentication#login"
 
       resources :books, only: [:index, :show, :create, :update, :destroy]
+
+      resources :borrowings, only: [:create]
     end
   end
 end
