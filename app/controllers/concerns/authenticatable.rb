@@ -13,7 +13,11 @@ module Authenticatable
 
     payload = JwtService.decode(token)
     @current_user = User.find_by(id: payload[:user_id])
-    render_unauthorized("User not found") unless @current_user
+    return render_unauthorized("User not found") unless @current_user
+
+    if payload[:token_version].to_i != @current_user.token_version
+      render_unauthorized("Token has been revoked")
+    end
   rescue JWT::ExpiredSignature
     render_unauthorized("Token has expired")
   rescue JWT::DecodeError

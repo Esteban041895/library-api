@@ -82,4 +82,32 @@ RSpec.describe "Api::V1::Authentication", type: :request do
       end
     end
   end
+
+  describe "DELETE /api/v1/logout" do
+    let!(:user) { create(:user, email: "alice@example.com", password: "password123") }
+
+    context "with a valid token" do
+      it "returns 204 and invalidates the token" do
+        delete "/api/v1/logout", headers: auth_headers(user)
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "rejects the old token on subsequent requests" do
+        old_headers = auth_headers(user)
+        delete "/api/v1/logout", headers: old_headers
+
+        get "/api/v1/books", headers: old_headers
+        expect(response).to have_http_status(:unauthorized)
+        body = JSON.parse(response.body)
+        expect(body["error"]).to eq("Token has been revoked")
+      end
+    end
+
+    context "without a token" do
+      it "returns 401" do
+        delete "/api/v1/logout"
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end
