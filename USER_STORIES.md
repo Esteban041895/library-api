@@ -1,15 +1,5 @@
 # Library API — User Stories
 
-## Implementation Status
-
-| Symbol | Meaning |
-|--------|---------|
-| ✅ | Implemented |
-| ⚠️ | Partial |
-| ❌ | Missing |
-
----
-
 ## Epic 1 — Authentication & Authorization
 
 ### US-01 · Register ✅

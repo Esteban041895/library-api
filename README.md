@@ -12,10 +12,11 @@ A full-stack library management system built with **Ruby on Rails** (API) and **
 | Database | PostgreSQL |
 | Auth | JWT + token versioning (server-side logout) |
 | Authorization | Pundit |
-| Testing | RSpec, FactoryBot, Shoulda Matchers |
+| Backend Testing | RSpec, FactoryBot, Shoulda Matchers |
 | Frontend | React 19, TypeScript, Vite |
 | Styling | Tailwind CSS |
 | State | React Query + Context API |
+| Frontend Testing | Vitest, React Testing Library |
 
 ---
 
@@ -97,6 +98,8 @@ Seeded automatically by `rails db:seed`:
 
 ## Running Tests
 
+### Backend
+
 ```bash
 bundle exec rspec
 ```
@@ -111,6 +114,25 @@ Run with documentation format:
 
 ```bash
 bundle exec rspec --format documentation
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm test
+```
+
+Run in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Run with coverage report:
+
+```bash
+npm run test:coverage
 ```
 
 ---
@@ -192,8 +214,10 @@ library-api/
     └── src/
         ├── components/
         ├── context/
+        ├── hooks/
         ├── lib/
-        └── pages/
+        ├── pages/
+        └── test/
 ```
 
 ---
