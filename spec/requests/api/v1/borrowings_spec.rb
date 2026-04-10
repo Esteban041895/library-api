@@ -6,6 +6,31 @@ RSpec.describe "Api::V1::Borrowings", type: :request do
   let(:other_member) { create(:user, :member) }
   let(:book) { create(:book, total_copies: 2) }
 
+  describe "GET /api/v1/borrowings" do
+    let!(:member_borrowing) { create(:borrowing, user: member, book: book) }
+    let!(:other_borrowing) { create(:borrowing, user: other_member, book: create(:book)) }
+
+    it "returns all borrowings for librarian" do
+      get "/api/v1/borrowings", headers: auth_headers(librarian)
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.length).to eq(2)
+    end
+
+    it "returns only own borrowings for member" do
+      get "/api/v1/borrowings", headers: auth_headers(member)
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.length).to eq(1)
+      expect(body.first["user"]["id"]).to eq(member.id)
+    end
+
+    it "returns 401 for unauthenticated request" do
+      get "/api/v1/borrowings"
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
   describe "POST /api/v1/borrowings" do
     context "as member" do
       it "borrows an available book" do

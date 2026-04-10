@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
       resources :books, only: [:index, :show, :create, :update, :destroy]
 
-      resources :borrowings, only: [:create] do
+      resources :borrowings, only: [:index, :create] do
         member do
           patch :return
         end

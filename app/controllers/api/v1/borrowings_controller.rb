@@ -3,6 +3,11 @@ module Api
     class BorrowingsController < ApplicationController
       include Authenticatable
 
+      def index
+        borrowings = policy_scope(Borrowing).includes(:book, :user).order(due_date: :asc)
+        render json: borrowings.map { |b| borrowing_json(b) }
+      end
+
       def create
         book = Book.find(params[:borrowing][:book_id])
         borrowing = Borrowing.new(
