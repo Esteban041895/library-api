@@ -57,4 +57,33 @@ RSpec.describe "Api::V1::Books", type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  describe "POST /api/v1/books" do
+    let(:valid_params) { { book: { title: "New Book", author: "Author", genre: "Fiction", isbn: "ISBN-001", total_copies: 5 } } }
+
+    context "as librarian" do
+      it "creates a book" do
+        post "/api/v1/books", params: valid_params, headers: auth_headers(librarian)
+        expect(response).to have_http_status(:created)
+        body = JSON.parse(response.body)
+        expect(body["title"]).to eq("New Book")
+      end
+    end
+
+    context "as member" do
+      it "returns 403" do
+        post "/api/v1/books", params: valid_params, headers: auth_headers(member)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "with invalid params" do
+      it "returns 422" do
+        post "/api/v1/books", params: { book: { title: "" } }, headers: auth_headers(librarian)
+        expect(response).to have_http_status(:unprocessable_entity)
+        body = JSON.parse(response.body)
+        expect(body["errors"]).to be_present
+      end
+    end
+  end
 end

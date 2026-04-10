@@ -6,7 +6,7 @@ Rails.application.routes.draw do
       post "register", to: "authentication#register"
       post "login", to: "authentication#login"
 
-      resources :books, only: [:index, :show]
+      resources :books, only: [:index, :show, :create]
     end
   end
 end

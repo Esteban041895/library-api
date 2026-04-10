@@ -14,7 +14,21 @@ module Api
         render json: book_json(book)
       end
 
+      def create
+        book = Book.new(book_params)
+        authorize book
+        if book.save
+          render json: book_json(book), status: :created
+        else
+          render json: { errors: book.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
       private
+
+      def book_params
+        params.require(:book).permit(:title, :author, :genre, :isbn, :total_copies)
+      end
 
       def book_json(book)
         {
