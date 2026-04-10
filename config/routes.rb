@@ -13,6 +13,8 @@ Rails.application.routes.draw do
           patch :return
         end
       end
+
+      get "dashboard", to: "dashboard#index"
     end
   end
 end
