@@ -86,4 +86,21 @@ RSpec.describe "Api::V1::Books", type: :request do
       end
     end
   end
+
+  describe "PATCH /api/v1/books/:id" do
+    context "as librarian" do
+      it "updates the book" do
+        patch "/api/v1/books/#{book.id}", params: { book: { title: "Updated Title" } }, headers: auth_headers(librarian)
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)["title"]).to eq("Updated Title")
+      end
+    end
+
+    context "as member" do
+      it "returns 403" do
+        patch "/api/v1/books/#{book.id}", params: { book: { title: "Hacked" } }, headers: auth_headers(member)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end
