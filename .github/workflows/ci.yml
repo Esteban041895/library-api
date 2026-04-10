@@ -58,6 +58,7 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/library_api_test
+      SECRET_KEY_BASE: a9b8C7d6E5f4G3h2I1j0K9l8M7n6O5p4
 
     steps:
       - name: Checkout code
