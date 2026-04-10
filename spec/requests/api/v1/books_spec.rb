@@ -103,4 +103,21 @@ RSpec.describe "Api::V1::Books", type: :request do
       end
     end
   end
+
+  describe "DELETE /api/v1/books/:id" do
+    context "as librarian" do
+      it "deletes the book" do
+        delete "/api/v1/books/#{book.id}", headers: auth_headers(librarian)
+        expect(response).to have_http_status(:no_content)
+        expect(Book.exists?(book.id)).to be false
+      end
+    end
+
+    context "as member" do
+      it "returns 403" do
+        delete "/api/v1/books/#{book.id}", headers: auth_headers(member)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
 end

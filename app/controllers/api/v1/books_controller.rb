@@ -34,6 +34,13 @@ module Api
         end
       end
 
+      def destroy
+        book = Book.find(params[:id])
+        authorize book
+        book.destroy
+        head :no_content
+      end
+
       private
 
       def book_params
