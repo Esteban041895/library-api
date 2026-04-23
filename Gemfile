@@ -43,7 +43,7 @@ group :development, :test do
   # Testing
   gem "rspec-rails", "~> 7.1"
   gem "factory_bot_rails", "~> 6.4"
-  gem "shoulda-matchers", "~> 6.4"
+  gem "shoulda-matchers", "~> 7.0"
   gem "faker", "~> 3.5"
   gem "database_cleaner-active_record", "~> 2.2"
 end
